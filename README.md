@@ -1,96 +1,99 @@
-    <h1 align="center">E-Commerce Backend API</h1>
-    <h5 align="center">This repository contains the backend API for an e-commerce website built using Node.js, Express, and MongoDB. It provides various endpoints to manage products, users, and orders for the associated front-end application.</h5>
-    <br />
+# E-Commerce Backend API
 
-    <h2>Table of Contents</h2>
-    <ul>
-        <li><a href="#configuration-and-setup">Configuration and Setup</a></li>
-        <li><a href="#key-features">Key Features</a></li>
-        <li><a href="#technologies-used">Technologies used</a></li>
-        <li><a href="#author">Author</a></li>
-        <li><a href="#license">License</a></li>
-    </ul>
+This repository contains the backend API for an e-commerce website built using Node.js, Express, and MongoDB. It provides various endpoints to manage products, users, and orders for the associated front-end application.
 
-    <h2 id="configuration-and-setup">Configuration and Setup</h2>
+## API Check
 
-    <p>In order to run this project locally, simply fork and clone the repository or download as zip and unzip on your machine.</p>
-    <ul>
-        <li>Open the project in your preferred code editor.</li>
-        <li>Go to terminal -> New terminal (If you are using VS code)</li>
-     </ul>
+to check this code API download Insomnia.json file from this repo and simply import inside API test app like Insomnia or Postman.
 
-    <p>In the terminal</p>
+or directly check by this link: (https://e-commerce-app-api-alpha.vercel.app/)
 
-    ```bash
-    $ npm install # to install frontend-side dependencies
-    $ npm run dev # to start the frontend
+## Table of content
 
-    ```
+- Configuration and Setup
 
-    <p>In the second terminal</p>
+- Key Features
 
+- Technologies used
 
-    ```
-    # .env
+- Author
 
-    PORT = 5000
-    MONGO_URL = "PASTE_HERE"
-    JWT_SECRET = "PASTE_HERE"
-    MAIL_ID = "YOUR_EMAIL"
-    MP = "PASTE_HERE"
+- License
 
-    CLOUD_NAME = "PASTE_HERE"
-    API_KEY = "PASTE_HERE"
-    API_SECRET = "PASTE_HERE"
-    ```
+## Configuration and Setup
 
-    <h2 id="key-features">Key Features</h2>
+In order to run this project locally, simply fork and clone the repository or download as zip and unzip on your machine.
 
-    <ul>
-        <li>Project Setup</li>
-        <li>User Authentication and Authorization</li>
-        <li>Product Management</li>
-        <li>User Interaction and Rating</li>
-        <li>Order and Payment Management</li>
-        <li>CRUD operations (post create, read, update and delete)</li>
-    </ul>
+- Open the project in your preferred code editor.
+- Go to terminal -> New terminal (If you are using VS code)
 
-    <br />
+```In the terminal
+    npm install  // to install dependencies
+    npm run dev  // to start
 
-    <h2 id="technologies-used">Technologies used</h2>
-    <ul>
-    <li><a href="https://nodejs.org/en/">Node.js</a> - A runtime environment to help build fast server applications using JS</li>
-    <li><a href="https://www.npmjs.com/package/express">Express.js</a> - The server for handling and routing HTTP requests</li>
-    <li><a href="https://www.npmjs.com/package/bcryptjs">bcryptjs</a> - For data encryption</li>
-    <li><a href="https://cloudinary.com/">Cloudinary</a> - For file upload and image storage</li>
-    <li><a href="https://www.npmjs.com/package/cookie-parser">cookie-parser</a> - Middleware for handling cookies</li>
-    <li><a href="https://www.npmjs.com/package/dotenv">dotenv</a> - Zero Dependency module that loads environment variables</li>
-    <li><a href="https://www.npmjs.com/package/jsonwebtoken">jsonwebtoken</a> - For authentication</li>
-    <li><a href="https://mongoosejs.com/">Mongoose</a> - For modeling and mapping MongoDB data to JavaScript</li>
-    <li><a href="https://www.npmjs.com/package/morgan">morgan</a> - HTTP request logger middleware</li>
-    <li><a href="https://www.npmjs.com/package/multer">multer</a> - Middleware for handling multipart/form-data (file uploads)</li>
-    <li><a href="https://nodemailer.com/">Nodemailer</a> - Module for sending emails</li>
-    <li><a href="https://www.npmjs.com/package/nodemon">nodemon</a> - Utility for monitoring changes in the development environment</li>
-    <li><a href="https://sharp.pixelplumbing.com/">sharp</a> - High-performance image processing library</li>
-    <li><a href="https://www.npmjs.com/package/slugify">slugify</a> - Library to convert a string into a slug</li>
-    <li><a href="https://www.npmjs.com/package/uniqueid">uniqueid</a> - Library for generating unique IDs</li>
-    </ul>
+```
 
+## Environment Variables
 
-    <h3 id="database">Database</h3>
-    <ul>
-        <li><a href="https://www.mongodb.com/">MongoDB</a> - It provides a free cloud service to store MongoDB
-            collections.</li>
-    </ul>
+To run this project, you will need to add the following environment variables to your .env file
 
-    <h2 id="author">Author</h2>
-    <ul>
-        <li>Website: <a href="https://ashishsigdel.com.np/">Ashish Sigdel</a></li>
-        <li>Github: <a href="https://github.com/ashishsigdel">ashishsigdel</a></li>
-        <li>Linkedin: <a href="https://www.linkedin.com/in/ashish-sigdel-39106a268/">Ashish Sigdel</a></li>
-        <li>Email: <a href="mailto:a.asis.sigdel01@gmail.com">a.asis.sigdel01@gmail.com</a></li>
-    </ul>
+`PORT`
 
-    <h2 id="license">License</h2>
-    <p>MIT License</p>
-    <p>Copyright (c) 2024 - Ashish Sigdel</p>
+`MONGO_URL`
+
+`JWT_SECRET`
+
+`MAIL_ID`
+
+`MP`
+
+`CLOUD_NAME`
+
+`API_KEY`
+
+`API_SECRET`
+
+## Key features
+
+- Project Setup
+
+- User Authentication and Authorization
+
+- Product Management
+
+- User Interaction and Rating
+
+- Order and Payment Management
+
+- CRUD operations (post create, read, update and delete
+
+## Technologies used
+
+- [Node.js](https://nodejs.org/en) - A runtime environment to help build fast server applications using JS
+- [Express.js](https://www.npmjs.com/package/express) - The server for handling and routing HTTP requests
+- [bcryptjs](https://www.npmjs.com/package/bcryptjs) - For data encryption
+- [Cloudinary](https://cloudinary.com/) - For file upload and image storage
+- [cookie-parser](https://www.npmjs.com/package/cookie-parser) - Middleware for handling cookies
+- [dotenv](https://www.npmjs.com/package/dotenv) - Zero Dependency module that loads environment variables
+- [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken) - For authentication
+- [Mongoose](https://mongoosejs.com/) - For modeling and mapping MongoDB data to JavaScript
+- [morgan](https://www.npmjs.com/package/morgan) - HTTP request logger middleware
+- [multer](https://www.npmjs.com/package/multer) - Middleware for handling multipart/form-data (file uploads)
+- [Nodemailer](https://nodemailer.com/) - Module for sending emails
+- [nodemon](https://www.npmjs.com/package/nodemon) - Utility for monitoring changes in the development environment
+- [sharp](https://sharp.pixelplumbing.com/) - High-performance image processing library
+- [slugify](https://www.npmjs.com/package/slugify) - Library to convert a string into a slug
+- [uniqid](https://www.npmjs.com/package/uniqid) - Generate unique IDs
+
+## Author
+
+### Ashish Sigdel
+
+- [Website](https://www.ashishsigdel.com.np)
+- [Github](https://github.com/ashishsigdel)
+- [Linkedin](https://www.linkedin.com/in/ashish-sigdel-39106a268)
+- [Email](mailto:a.asis.sigdel01@gmail.com">a.asis.sigdel01@gmail.com)
+
+## License
+
+#### Copyright (c) 2024 - Ashish Sigdel
