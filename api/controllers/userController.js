@@ -230,11 +230,24 @@ export const forgotPasswordToken = async (req, res, next) => {
   const user = await User.findOne({ email });
   if (!user) return next(errorHandler(404, "User not found!"));
 
-  try {
-    const token = await user.generatePasswordResetToken();
-    await user.save();
+  console.log(user);
 
-    const resetURL = `Hi, Please follow this link to reset your password. This link is valid only for 10 minutes. <a href="http://localhost:5000/api/user/reset-password/${token}">Click here</a>`;
+  try {
+    const generatedToken = crypto.randomBytes(32).toString("hex");
+    const passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+    await User.findByIdAndUpdate(
+      user.id,
+      {
+        $set: {
+          passwordResetToken: generatedToken,
+          passwordResetExpires: passwordResetExpires,
+        },
+      },
+      { new: true }
+    );
+
+    const resetURL = `Hi, Please follow this link to reset your password. This link is valid only for 10 minutes. <a href="http://localhost:5000/api/user/reset-password/${generatedToken}">Click here</a>`;
 
     const data = {
       to: email,
@@ -243,9 +256,9 @@ export const forgotPasswordToken = async (req, res, next) => {
       htm: resetURL,
     };
 
-    await sendEmail(data);
+    sendEmail(data);
 
-    res.json(token);
+    res.json(generatedToken);
   } catch (error) {
     next(error);
   }
@@ -256,21 +269,21 @@ export const resetPassword = async (req, res, next) => {
     const { password } = req.body;
     const hashedPassword = bcryptjs.hashSync(password, 10);
     const { token } = req.params;
-    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
-    const user = await User.findOne({
-      passwordResetToken: hashedToken,
+    const findUser = await User.findOne({
+      passwordResetToken: token,
       passwordResetExpires: { $gt: Date.now() },
     });
-    if (!user) {
-      return next(errorHandler(401, "Token expired, Please try again later!"));
-    }
 
-    user.password = hashedPassword;
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
-    await user.save();
-    res.json(user);
+    if (!findUser) {
+      res.json({ message: "Token expired or token Incorrect!" });
+      return next(errorHandler(401, "Token Incorrect or token expired!"));
+    }
+    findUser.password = hashedPassword;
+    findUser.passwordResetToken = undefined;
+    findUser.passwordResetExpires = undefined;
+    await findUser.save();
+    res.json(findUser);
   } catch (error) {
     next(error);
   }
