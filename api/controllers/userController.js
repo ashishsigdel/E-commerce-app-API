@@ -279,11 +279,19 @@ export const resetPassword = async (req, res, next) => {
       res.json({ message: "Token expired or token Incorrect!" });
       return next(errorHandler(401, "Token Incorrect or token expired!"));
     }
-    findUser.password = hashedPassword;
-    findUser.passwordResetToken = undefined;
-    findUser.passwordResetExpires = undefined;
-    await findUser.save();
-    res.json(findUser);
+    await User.findByIdAndUpdate(
+      findUser.id,
+      {
+        $set: {
+          password: hashedPassword,
+          passwordResetToken: undefined,
+          passwordResetExpires: undefined,
+        },
+      },
+      { new: true }
+    );
+
+    res.json({ message: "password updated" });
   } catch (error) {
     next(error);
   }
