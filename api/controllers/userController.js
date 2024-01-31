@@ -233,7 +233,7 @@ export const forgotPasswordToken = async (req, res, next) => {
   console.log(user);
 
   try {
-    const generatedToken = crypto.randomBytes(32).toString("hex");
+    const generatedToken = Math.random().toString(36).slice(-6);
     const passwordResetExpires = Date.now() + 10 * 60 * 1000;
 
     await User.findByIdAndUpdate(
@@ -247,18 +247,18 @@ export const forgotPasswordToken = async (req, res, next) => {
       { new: true }
     );
 
-    const resetURL = `Hi, Please follow this link to reset your password. This link is valid only for 10 minutes. <a href="http://localhost:5000/api/user/reset-password/${generatedToken}">Click here</a>`;
+    const resetURL = `Hi, Please Use this OTP to reset your password. This OTP is valid only for 10 minutes. OTP:- ${generatedToken}`;
 
     const data = {
       to: email,
       text: "Hey User",
-      subject: "Forgot Password Link",
+      subject: "Forgot Password OTP",
       htm: resetURL,
     };
 
     sendEmail(data);
 
-    res.json(generatedToken);
+    res.json({ message: "OTP sent" });
   } catch (error) {
     next(error);
   }
@@ -276,10 +276,9 @@ export const resetPassword = async (req, res, next) => {
     });
 
     if (!findUser) {
-      res.json({ message: "Token expired or token Incorrect!" });
-      return next(errorHandler(401, "Token Incorrect or token expired!"));
+      if (!findUser) return next(errorHandler(401, "Wrong OTP!"));
     }
-    await User.findByIdAndUpdate(
+    const update = await User.findByIdAndUpdate(
       findUser.id,
       {
         $set: {
@@ -290,8 +289,9 @@ export const resetPassword = async (req, res, next) => {
       },
       { new: true }
     );
-
-    res.json({ message: "password updated" });
+    if (update) {
+      res.json({ success: true });
+    }
   } catch (error) {
     next(error);
   }
