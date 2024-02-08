@@ -8,9 +8,8 @@ import {
   getBlog,
   likeBlog,
   updateBlog,
-  uploadImages,
+  // uploadImages,
 } from "../controllers/blogController.js";
-import { blogImgResize, uploadPhoto } from "../utils/uploadImages.js";
 
 const router = express.Router();
 
@@ -18,14 +17,13 @@ router.post("/", verifyToken, verifyAdmin, createBlog);
 router.post("/likes", verifyToken, verifyAdmin, likeBlog);
 router.post("/dislikes", verifyToken, verifyAdmin, dislikeBlog);
 router.post("/:id", verifyToken, verifyAdmin, updateBlog);
-router.put(
-  "/upload/:id",
-  verifyToken,
-  verifyAdmin,
-  uploadPhoto.array("images", 10),
-  blogImgResize,
-  uploadImages
-);
+// router.put(
+//   "/upload/:id",
+//   verifyToken,
+//   verifyAdmin,
+
+//   uploadImages
+// );
 router.delete("/:id", verifyToken, verifyAdmin, deleteBlog);
 router.get("/:id", getBlog);
 router.get("/", getAllBlog);

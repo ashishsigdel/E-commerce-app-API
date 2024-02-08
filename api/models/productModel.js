@@ -39,12 +39,14 @@ const productSchema = new mongoose.Schema(
     },
     images: {
       type: Array,
-      default: [],
-    },
-    color: {
-      type: String,
       required: true,
     },
+    color: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
     ratings: [
       {
         star: Number,
@@ -55,6 +57,10 @@ const productSchema = new mongoose.Schema(
     totalrating: {
       type: String,
       default: 0,
+    },
+    userRef: {
+      type: String,
+      required: true,
     },
   },
   { timestamps: true }

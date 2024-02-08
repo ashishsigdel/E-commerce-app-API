@@ -2,6 +2,7 @@ import express from "express";
 import {
   applyCoupon,
   blockUser,
+  createAdmin,
   createOrder,
   createUser,
   deleteUser,
@@ -12,6 +13,7 @@ import {
   getUser,
   getUserCart,
   getWishlist,
+  google,
   logOut,
   loginAdmin,
   loginUser,
@@ -29,7 +31,9 @@ const router = express.Router();
 
 router.get("/test", test);
 router.post("/register", createUser);
+router.post("/register-admin", createAdmin);
 router.post("/login", loginUser);
+router.post("/google", google);
 router.post("/admin-login", loginAdmin);
 router.post("/cart", verifyToken, userCart);
 router.get("/cart", verifyToken, getUserCart);

@@ -18,7 +18,6 @@ const userSchema = new mongoose.Schema(
     },
     mobile: {
       type: String,
-      required: true,
     },
     password: {
       type: String,
@@ -42,6 +41,11 @@ const userSchema = new mongoose.Schema(
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
     refreshToken: {
       type: String,
+    },
+    profilePic: {
+      type: String,
+      default:
+        "https://static.vecteezy.com/system/resources/thumbnails/009/292/244/small/default-avatar-icon-of-social-media-user-vector.jpg",
     },
     passwordChangeAt: Date,
     passwordResetToken: String,

@@ -4,7 +4,6 @@ import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import { sendEmail } from "./emailController.js";
-import crypto from "crypto";
 import Cart from "../models/cartModel.js";
 import Product from "../models/productModel.js";
 import Coupon from "../models/couponModel.js";
@@ -42,6 +41,33 @@ export const createUser = async (req, res, next) => {
   }
 };
 
+export const createAdmin = async (req, res, next) => {
+  const { firstName, lastName, email, mobile, password } = req.body;
+
+  const findUser = await User.findOne({ email });
+
+  if (!findUser) {
+    const hashedPassword = bcryptjs.hashSync(password, 10);
+    const newUser = new User({
+      firstName,
+      lastName,
+      email,
+      mobile,
+      password: hashedPassword,
+      role: "admin",
+    });
+    try {
+      await newUser.save();
+      res.status(201).json("User created successfully..");
+    } catch (error) {
+      res.status(500).json(error.message);
+      next(error);
+    }
+  } else {
+    return next(errorHandler(422, "Seller already exits with that email!"));
+  }
+};
+
 export const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
   try {
@@ -59,7 +85,52 @@ export const loginUser = async (req, res, next) => {
         .status(200)
         .json(rest);
     } else {
-      return next(errorHandler(400, "Proceed to Admin login."));
+      return next(
+        errorHandler(
+          400,
+          "This email belogs to seller account. Please choose different account to shop."
+        )
+      );
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const google = async (req, res, next) => {
+  const { firstName, lastName, email, profilePic, mobile } = req.body;
+  try {
+    const findUser = await User.findOne({ email });
+    console.log(findUser);
+    if (!findUser) {
+      const generatedPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8);
+      const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
+      const newUser = new User({
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        profilePic,
+        mobile,
+      });
+      await newUser.save();
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+      const { password, ...rest } = newUser._doc;
+      res
+        .status(200)
+        .cookie("access_token", token, {
+          httpOnly: true,
+        })
+        .json(rest);
+    } else {
+      const token = jwt.sign({ id: findUser._id }, process.env.JWT_SECRET);
+      const { password: pass, ...rest } = findUser._doc;
+      res
+        .cookie("access_token", token, { httpOnly: true })
+        .status(200)
+        .json(rest);
     }
   } catch (error) {
     next(error);
@@ -70,7 +141,7 @@ export const loginAdmin = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const findAdmin = await User.findOne({ email });
-    if (!findAdmin) return next(errorHandler(404, "User not found!"));
+    if (!findAdmin) return next(errorHandler(404, "Seller not found!"));
 
     if (findAdmin.role == "admin") {
       const validPassword = bcryptjs.compareSync(password, findAdmin.password);
@@ -107,6 +178,8 @@ export const updateUser = async (req, res, next) => {
           email: req.body.email,
           password: req.body.password,
           mobile: req.body.mobile,
+          profilePic: req.body.profilePic,
+          address: req.body.address,
         },
       },
       { new: true }
