@@ -17,6 +17,7 @@ import {
   logOut,
   loginAdmin,
   loginUser,
+  removeFromCart,
   resetPassword,
   saveAddress,
   test,
@@ -40,6 +41,7 @@ router.get("/cart", verifyToken, getUserCart);
 router.post("/cart/applycoupon", verifyToken, applyCoupon);
 router.post("/cart/cash-order", verifyToken, createOrder);
 router.delete("/empty-cart", verifyToken, emptyCart);
+router.delete("/cart/:productId", verifyToken, removeFromCart);
 
 router.post("/forgot-password-token", forgotPasswordToken);
 router.post("/reset-password/:token", resetPassword);
@@ -56,7 +58,7 @@ router.put(
   updateOrderStatus
 );
 router.get("/wishlist", verifyToken, getWishlist);
-router.get("/:id", verifyToken, verifyAdmin, getUser);
+router.get("/:id", verifyToken, getUser);
 
 router.delete("/:id", verifyToken, deleteUser);
 router.post("/block-user/:id", verifyToken, verifyAdmin, blockUser);

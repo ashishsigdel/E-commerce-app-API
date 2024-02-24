@@ -19,7 +19,7 @@ router.get("/get", getAllProduct);
 router.post("/wishlist", verifyToken, addToWishlist);
 router.post("/rating", verifyToken, rating);
 
-router.get("/:id", getProduct);
+router.get("/getproduct", getProduct);
 router.post("/:id", verifyAdmin, verifyToken, updateProduct);
 router.delete("/:id", verifyAdmin, verifyToken, deleteProduct);
 

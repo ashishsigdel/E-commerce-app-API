@@ -384,36 +384,119 @@ export const userCart = async (req, res, next) => {
   const { cart } = req.body;
   const { id } = req.user;
   const user = await User.findById(id);
+
   if (!user) return next(errorHandler(404, "User not found!"));
+
   try {
     let products = [];
-    const alreadyCarted = await Cart.findOne({ orderBy: user.id });
-
-    if (alreadyCarted) {
-      alreadyCarted.remove();
-    }
-
-    for (let i = 0; i < cart.length; i++) {
-      let object = {};
-      object.product = cart[i].id;
-      object.count = cart[i].count;
-      object.color = cart[i].color;
-
-      let getPrice = await Product.findById(cart[i].id).select("price").exec();
-      object.price = getPrice.price;
-      products.push(object);
-    }
     let cartTotal = 0;
-    for (let i = 0; i < products.length; i++) {
-      cartTotal = cartTotal + products[i].price * products[i].count;
+
+    const existingCart = await Cart.findOne({ orderBy: user.id });
+
+    if (existingCart) {
+      for (let i = 0; i < cart.length; i++) {
+        let object = {};
+        object.product = cart[i].id;
+        object.count = cart[i].count;
+        object.color = cart[i].color;
+
+        let getPrice = await Product.findById(cart[i].id)
+          .select("price")
+          .exec();
+        object.price = getPrice.price;
+        products.push(object);
+
+        // Update existing product in the cart if it already exists
+        const existingProductIndex = existingCart.products.findIndex(
+          (item) => item.product.toString() === cart[i].id
+        );
+
+        if (existingProductIndex !== -1) {
+          existingCart.products[existingProductIndex].count += cart[i].count;
+        } else {
+          // Add the new product to the existing cart
+          existingCart.products.push(object);
+        }
+      }
+
+      // Recalculate cartTotal
+      for (let i = 0; i < existingCart.products.length; i++) {
+        cartTotal +=
+          existingCart.products[i].price * existingCart.products[i].count;
+      }
+
+      existingCart.cartTotal = cartTotal;
+
+      await existingCart.save();
+      res.json(existingCart);
+    } else {
+      // Create a new cart if one doesn't exist
+      for (let i = 0; i < cart.length; i++) {
+        let object = {};
+        object.product = cart[i].id;
+        object.count = cart[i].count;
+        object.color = cart[i].color;
+
+        let getPrice = await Product.findById(cart[i].id)
+          .select("price")
+          .exec();
+        object.price = getPrice.price;
+        products.push(object);
+        cartTotal += object.price * object.count;
+      }
+
+      let newCart = await new Cart({
+        products,
+        cartTotal,
+        orderBy: user?.id,
+      }).save();
+
+      res.json(newCart);
     }
-    console.log(products, cartTotal);
-    let newCart = await new Cart({
-      products,
-      cartTotal,
-      orderBy: user?.id,
-    }).save();
-    res.json(newCart);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const removeFromCart = async (req, res, next) => {
+  const { productId } = req.params;
+  const { id } = req.user;
+
+  try {
+    const user = await User.findById(id);
+    if (!user) return next(errorHandler(404, "User not found!"));
+
+    // Check if there is an existing cart for the user
+    const existingCart = await Cart.findOne({ orderBy: user.id });
+
+    if (!existingCart) {
+      return next(errorHandler(404, "Product not found!"));
+    }
+
+    // Find the index of the product in the cart
+    const productIndex = existingCart.products.findIndex((product) =>
+      product.product.equals(productId)
+    );
+
+    if (productIndex !== -1) {
+      // Remove the product from the cart
+      existingCart.products.splice(productIndex, 1);
+
+      // Recalculate cartTotal
+      existingCart.cartTotal = existingCart.products.reduce(
+        (total, product) => total + product.price * product.count,
+        0
+      );
+
+      // Save the updated cart
+      await existingCart.save();
+
+      return res.json(existingCart);
+    } else {
+      return res
+        .status(404)
+        .json({ message: "Product not found in the cart." });
+    }
   } catch (error) {
     next(error);
   }
@@ -452,7 +535,7 @@ export const applyCoupon = async (req, res, next) => {
   const { coupon } = req.body;
   const { id } = req.user;
   const validCoupon = await Coupon.findOne({ name: coupon });
-  if (!validCoupon) return next(errorHandler(404, "Coupon is not applicable."));
+  if (!validCoupon) return next(errorHandler(401, "Coupon not accepted!"));
 
   const user = await User.findOne({ id });
   let { products, cartTotal } = await Cart.findOne({

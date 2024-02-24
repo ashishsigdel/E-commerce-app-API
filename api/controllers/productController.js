@@ -42,14 +42,29 @@ export const deleteProduct = async (req, res, next) => {
 };
 
 export const getProduct = async (req, res, next) => {
-  const { id } = req.params;
-  const findProduct = await Product.findById(id);
-  if (!findProduct) {
-    return next(errorHandler(404, "Product not found!"));
-  }
-
   try {
-    res.json(findProduct);
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 9;
+    const sortDirection = req.query.order === "asc" ? 1 : -1;
+    const products = await Product.find({
+      ...(req.query.userRef && { userRef: req.query.userRef }),
+      ...(req.query.category && { category: req.query.category }),
+      ...(req.query.slug && { slug: req.query.slug }),
+      ...(req.query.productId && { _id: req.query.productId }),
+      ...(req.query.searchTerm && {
+        $or: [
+          { title: { $regex: req.query.searchTerm, $options: "i" } },
+          { description: { $regex: req.query.searchTerm, $options: "i" } },
+        ],
+      }),
+    })
+      .sort({ updatedAt: sortDirection })
+      .skip(startIndex)
+      .limit(limit);
+
+    res.status(200).json({
+      products,
+    });
   } catch (error) {
     next(error);
   }
@@ -184,7 +199,8 @@ export const rating = async (req, res, next) => {
       .map((item) => item.star)
       .reduce((prev, curr) => prev + curr, 0);
 
-    let actualRating = Math.round(ratingSum / totalRatings);
+    let actualRating = (ratingSum / totalRatings).toFixed(1);
+
     const updatedProduct = await Product.findByIdAndUpdate(
       prodId,
       {
