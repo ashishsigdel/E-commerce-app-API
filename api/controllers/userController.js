@@ -572,9 +572,9 @@ export const createOrder = async (req, res, next) => {
         id: uniqid(),
         method: "COD",
         amount: finalAmount,
-        status: "Cash on Delevery",
+        status: "Cash on Delivery",
         created: Date.now(),
-        currency: "USD",
+        currency: "Rs.",
       },
       orderBy: user.id,
       orderStatus: "Cash on Delevery",
@@ -597,12 +597,40 @@ export const createOrder = async (req, res, next) => {
 
 export const getOrders = async (req, res, next) => {
   const { id } = req.user;
+  const findUser = await User.findById(id);
+  if (!findUser) return next(errorHandler(404, "User not found!"));
+
   try {
-    const userOrders = await Order.findOne({ orderBy: id })
-      .populate("products.product")
-      .exec();
-    res.json(userOrders);
+    const order = await Order.find({ orderBy: id }).populate(
+      "products.product"
+    );
+    res.json(order);
   } catch (error) {
+    next(error);
+  }
+};
+
+export const getAdminOrders = async (req, res, next) => {
+  const { id } = req.user;
+  const findUser = await User.findById(id);
+
+  if (!findUser) {
+    return next(errorHandler(404, "User not found!"));
+  }
+
+  try {
+    const orders = await Order.find().populate("products.product");
+
+    // Filter orders based on userRef
+    const filteredOrders = orders.filter((order) =>
+      order.products.some(
+        (product) => product.product.userRef.toString() === id.toString()
+      )
+    );
+
+    res.json(filteredOrders);
+  } catch (error) {
+    console.error("Error:", error);
     next(error);
   }
 };
@@ -617,9 +645,9 @@ export const updateOrderStatus = async (req, res, next) => {
     const updateOrderStatus = await Order.findByIdAndUpdate(
       id,
       {
-        orderStatus: status,
-        paymentIntent: {
-          status: status,
+        $set: {
+          orderStatus: status,
+          "paymentIntent.status": status,
         },
       },
       { new: true }

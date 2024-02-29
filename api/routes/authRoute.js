@@ -8,6 +8,7 @@ import {
   deleteUser,
   emptyCart,
   forgotPasswordToken,
+  getAdminOrders,
   getAllUser,
   getOrders,
   getUser,
@@ -57,6 +58,8 @@ router.put(
   verifyAdmin,
   updateOrderStatus
 );
+router.get("/order/get-orders", verifyToken, verifyAdmin, getAdminOrders);
+
 router.get("/wishlist", verifyToken, getWishlist);
 router.get("/:id", verifyToken, getUser);
 
