@@ -2,6 +2,7 @@ import express from "express";
 import {
   applyCoupon,
   blockUser,
+  cancelOrder,
   createAdmin,
   createOrder,
   createUser,
@@ -58,6 +59,7 @@ router.put(
   verifyAdmin,
   updateOrderStatus
 );
+router.put("/order/cancel-order/:id", verifyToken, cancelOrder);
 router.get("/order/get-orders", verifyToken, verifyAdmin, getAdminOrders);
 
 router.get("/wishlist", verifyToken, getWishlist);

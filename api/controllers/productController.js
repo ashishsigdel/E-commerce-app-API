@@ -74,9 +74,15 @@ export const getAllProduct = async (req, res, next) => {
   try {
     // filtering
     const queryObj = { ...req.query };
-    const excludeFields = ["page", "sort", "limit", "fields"];
+    const excludeFields = ["page", "sort", "limit", "fields", "searchTerm"];
     excludeFields.forEach((el) => delete queryObj[el]);
-    console.log(queryObj);
+    if (req.query.searchTerm) {
+      queryObj.$or = [
+        { title: { $regex: req.query.searchTerm, $options: "i" } },
+        { description: { $regex: req.query.searchTerm, $options: "i" } },
+        { category: { $regex: req.query.searchTerm, $options: "i" } },
+      ];
+    }
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 
@@ -88,6 +94,27 @@ export const getAllProduct = async (req, res, next) => {
       query = query.sort(sortBy);
     } else {
       query = query.sort("-createdAt");
+    }
+
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(",").join(" ");
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort("-sold"); // Sort by highest sold first
+    }
+
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(",").join(" ");
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort("-totalrating");
+    }
+
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(",").join(" ");
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort("-price");
     }
 
     //limiting the fields

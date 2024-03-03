@@ -320,7 +320,37 @@ export const forgotPasswordToken = async (req, res, next) => {
       { new: true }
     );
 
-    const resetURL = `Hi, Please Use this OTP to reset your password. This OTP is valid only for 10 minutes. OTP:- ${generatedToken}`;
+    const resetURL = `<html>
+    <head>
+    <style>
+    .otp {
+      display: flex;
+      gap: 20px;
+    }
+    .otp p {
+      font-size: 40px;
+      color: blue;
+    }
+  </style>
+    </head>
+    <body>
+    <div class="container">
+    <h1>Password Reset OTP</h1>
+    <p>Hi there!</p>
+    <p>
+      Please use the following OTP to reset your password. This OTP is valid
+      only for 10 minutes.
+    </p>
+    <div class="otp">
+      <h1>OTP:</h1>
+      <p>${generatedToken}</p>
+    </div>
+    <p>
+      If you didn't request this password reset, please ignore this email.
+    </p>
+  </div>
+    </body>
+  </html>`;
 
     const data = {
       to: email,
@@ -577,7 +607,7 @@ export const createOrder = async (req, res, next) => {
         currency: "Rs.",
       },
       orderBy: user.id,
-      orderStatus: "Cash on Delevery",
+      orderStatus: "Cash on Delivery",
     }).save();
 
     let update = userCart.products.map((item) => {
@@ -640,20 +670,54 @@ export const updateOrderStatus = async (req, res, next) => {
   const { id } = req.params;
   const checkOrder = await Order.findById(id);
   if (!checkOrder) return next(errorHandler(404, "Order not found!"));
-
-  try {
-    const updateOrderStatus = await Order.findByIdAndUpdate(
-      id,
-      {
-        $set: {
-          orderStatus: status,
-          "paymentIntent.status": status,
+  if (checkOrder.orderStatus === "Cancelled") {
+    return next(errorHandler(401, "Order has been already cancelled!"));
+  } else {
+    try {
+      const updateOrderStatus = await Order.findByIdAndUpdate(
+        id,
+        {
+          $set: {
+            orderStatus: status,
+            "paymentIntent.status": status,
+          },
         },
-      },
-      { new: true }
-    );
-    res.json(updateOrderStatus);
-  } catch (error) {
-    next(error);
+        { new: true }
+      );
+      res.json(updateOrderStatus);
+    } catch (error) {
+      next(error);
+    }
+  }
+};
+
+export const cancelOrder = async (req, res, next) => {
+  const { status } = req.body;
+  const { id } = req.params;
+  const checkOrder = await Order.findById(id);
+  if (!checkOrder) return next(errorHandler(404, "Order not found!"));
+
+  if (
+    checkOrder.orderStatus === "Processing" ||
+    checkOrder.orderStatus === "Cash on Delivery" ||
+    checkOrder.orderStatus === "Not Processed"
+  ) {
+    try {
+      const updateOrderStatus = await Order.findByIdAndUpdate(
+        id,
+        {
+          $set: {
+            orderStatus: status,
+            "paymentIntent.status": status,
+          },
+        },
+        { new: true }
+      );
+      res.json(updateOrderStatus);
+    } catch (error) {
+      next(error);
+    }
+  } else {
+    return next(errorHandler(401, "You can't cancel order now!"));
   }
 };

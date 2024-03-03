@@ -24,10 +24,12 @@ const productSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
+      default: "Uncategorized",
     },
     brand: {
       type: String,
       required: true,
+      default: "No Brand",
     },
     quantity: {
       type: Number,
